@@ -5,17 +5,25 @@ using UnityEngine.UI;
 public class WordTextTab : MonoBehaviour
 {
 	public Text Id { get { return id; } }
-	public Text BaseWord { get { return baseWord; } }
-	public Text Translation { get { return translation; } }
-
+	public InputField ChangeableWord { get { return changeableWord; } }
+	public string BaseWord { get { return baseWord; } }
 
 	[SerializeField]
 	private Text id;
 
 	[SerializeField]
-	private Text baseWord;
+	private InputField changeableWord;
 
-	[SerializeField]
-	private Text translation;
+	protected string baseWord;
+
+	public virtual void SetChangeableWord(string word)
+	{
+		ChangeableWord.text = baseWord = word;
+	}
+
+	public virtual void ImplementChangeableWordValue()
+	{
+		baseWord = ChangeableWord.text;
+    }
 
 }
