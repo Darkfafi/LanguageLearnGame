@@ -118,6 +118,7 @@ public class WordListEditScreen : MonoBehaviour
 				if (currentLanguageSelected == FullWordListData.BASE_LANGUAGE)
 				{
 					w = GameObject.Instantiate<WordTextTab>(wordTabPrefab);
+					w.DeleteClickedEvent += OnWordTabDeleteClickedEvent;
 					w.SetChangeableWord(currentData.GetSectionByLanguage(FullWordListData.BASE_LANGUAGE).Words[i]);
 				}
 				else
@@ -130,8 +131,8 @@ public class WordListEditScreen : MonoBehaviour
 				
 				rt = w.transform as RectTransform;
 				w.Id.text = (i + 1).ToString() + ":";
-				
-				
+				w.TabTextModifiedEvent += OnTabTextModifiedEvent;
+
 				allActiveTabs.Add(w);
 			}
 			else 
@@ -158,6 +159,8 @@ public class WordListEditScreen : MonoBehaviour
 		{
 			for (int i = 0; i < allActiveTabs.Count; i++)
 			{
+				allActiveTabs[i].DeleteClickedEvent -= OnWordTabDeleteClickedEvent;
+				allActiveTabs[i].TabTextModifiedEvent -= OnTabTextModifiedEvent;
 				Destroy(allActiveTabs[i].gameObject);
             }
 		}
@@ -178,9 +181,29 @@ public class WordListEditScreen : MonoBehaviour
 		allLanguageTabs.Clear();
 	}
 
+	private void OnTabTextModifiedEvent(WordTextTab tab)
+	{
+		SetWordTabsInData();
+	}
+
+	private void OnWordTabDeleteClickedEvent(WordTextTab tab)
+	{
+		string[] wordList = currentData.GetSectionByLanguage(currentLanguageSelected).Words.ToArray();
+		int indexTab = wordList.GetIndexOf(tab.BaseWord);
+
+		foreach(WordListSectionData section in currentData.AllWordListDatas)
+		{
+			section.Words.RemoveAt(indexTab);
+		}
+		SetWordTabs();
+    }
+
 	private void AddWord()
 	{
-		currentData.GetSectionByLanguage(currentLanguageSelected).Words.Add("");
+		foreach(WordListSectionData dataSection in currentData.AllWordListDatas)
+		{
+			dataSection.Words.Add("");
+		}
 		SetWordTabs();
 		scrollRect.verticalNormalizedPosition = 0f;
     }
