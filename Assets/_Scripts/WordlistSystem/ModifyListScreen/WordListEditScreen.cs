@@ -39,6 +39,12 @@ public class WordListEditScreen : MonoBehaviour
 	[SerializeField]
 	private ScrollRect scrollRect;
 
+	[SerializeField]
+	private AskNamePopUp askNamePopUp;
+
+	[SerializeField]
+	private WordListModifierScreen wordlistModifier;
+
 	// data
 	private List<WordTextTab> allActiveTabs = new List<WordTextTab>();
 	private List<LanguageTab> allLanguageTabs = new List<LanguageTab>();
@@ -46,7 +52,7 @@ public class WordListEditScreen : MonoBehaviour
 	private FullWordListData currentData;
 	private string currentLanguageSelected = FullWordListData.BASE_LANGUAGE;
 
-	protected void Awake()
+	protected void OnEnable()
 	{
 		createLanugageWordTabButton.onClick.AddListener(() => AddWord());
 		createLanguageTabButton.onClick.AddListener(() => CreateLanguage());
@@ -54,7 +60,7 @@ public class WordListEditScreen : MonoBehaviour
 		backButton.onClick.AddListener(() => BackButtonPressed());
 	}
 
-	protected void Destroy()
+	protected void OnDisable()
 	{
 		createLanugageWordTabButton.onClick.RemoveAllListeners();
 		saveButton.onClick.RemoveAllListeners();
@@ -93,7 +99,7 @@ public class WordListEditScreen : MonoBehaviour
 	private void OnLanguageTabClickedEvent(LanguageTab tab)
 	{
 		SelectLanguage(tab.Language);
-    }
+	}
 
 	private void OnDeleteTabClickedEvent(LanguageTab tab)
 	{
@@ -149,7 +155,7 @@ public class WordListEditScreen : MonoBehaviour
 			}
 
 			rt.SetParent(textTabsHolder, false);
-			rt.localPosition = new Vector3(rt.position.x, 0 - ((((RectTransform)wordTabPrefab.transform).sizeDelta.y + space) * i), rt.position.z);
+			rt.localPosition = new Vector3(rt.position.x, 0 - (((((RectTransform)wordTabPrefab.transform).sizeDelta.y) + space) * i), rt.position.z);
 		}
 	}
 
@@ -210,16 +216,38 @@ public class WordListEditScreen : MonoBehaviour
 
 	private void CreateLanguage()
 	{
-		List<string> translationWordsList = new List<string>();
-		foreach(string word in currentData.GetSectionByLanguage(FullWordListData.BASE_LANGUAGE).Words)
-		{
-			translationWordsList.Add("");
-		}
-		string languageName = "New Language" + (allLanguageTabs.Count + 1).ToString(); // TODO Replace with a pop-up which asks for the name of the language and give the options 'Back' and 'Create'
-        WordListSectionData newLanguageSection = new WordListSectionData(languageName, translationWordsList.ToArray());
-		currentData.AllWordListDatas.Add(newLanguageSection);
-		SelectLanguage(languageName);
+		askNamePopUp.gameObject.SetActive(true);
+		askNamePopUp.SetTitleText("Creating new translation");
+		askNamePopUp.SetPlaceholderInputText("Language name");
+
+		askNamePopUp.PopupButtonPressedEvent -= OnPopupButtonPressedEvent;
+		askNamePopUp.PopupButtonPressedEvent += OnPopupButtonPressedEvent;
     }
+
+	private void OnPopupButtonPressedEvent(string givenName, AskNamePopUp.ButtonType buttonType, AskNamePopUp popUp)
+	{
+		askNamePopUp.PopupButtonPressedEvent -= OnPopupButtonPressedEvent;
+		if (buttonType == AskNamePopUp.ButtonType.Create)
+		{
+			if (currentData.GetSectionByLanguage(givenName) != null)
+			{
+				popUp.SetWarningText("Language name '" + givenName + "' already in use!");
+				CreateLanguage();
+				return;
+			}
+
+			List<string> translationWordsList = new List<string>();
+			foreach (string word in currentData.GetSectionByLanguage(FullWordListData.BASE_LANGUAGE).Words)
+			{
+				translationWordsList.Add("");
+			}
+			string languageName = givenName;
+			WordListSectionData newLanguageSection = new WordListSectionData(languageName, translationWordsList.ToArray());
+			currentData.AllWordListDatas.Add(newLanguageSection);
+			SelectLanguage(languageName);
+		}
+		popUp.Clean();
+	}
 
 	private void SaveData()
 	{
@@ -255,8 +283,8 @@ public class WordListEditScreen : MonoBehaviour
 
 	private void BackButtonPressed()
 	{
-		Debug.Log("Back!");
-	}
+		wordlistModifier.Activate();
+    }
 
 	private void SelectLanguage(string language)
 	{

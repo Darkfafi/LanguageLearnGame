@@ -26,7 +26,7 @@ public static class SaveLoadWordData
 
 	public static AllWordListsData Load()
 	{
-		if (File.Exists(fullPathToFile))
+        if (File.Exists(fullPathToFile))
 		{
 			BinaryFormatter bf = new BinaryFormatter();
 			FileStream file = File.Open(fullPathToFile, FileMode.Open);
@@ -53,16 +53,16 @@ public static class SaveLoadWordData
 [Serializable]
 public class AllWordListsData
 {
-	public FullWordListData[] AllWordlists { get; private set; }
+	public List<FullWordListData> AllWordlists { get; private set; }
 
 	public AllWordListsData(FullWordListData[] allLists)
 	{
-		AllWordlists = allLists != null ? allLists : new FullWordListData[] { };
+		AllWordlists = new List<FullWordListData>((allLists != null) ? allLists : new FullWordListData[] { });
 	}
 
 	public FullWordListData GetFullWordListByListName(string name)
 	{
-		for (int i = 0; i < AllWordlists.Length; i++)
+		for (int i = 0; i < AllWordlists.Count; i++)
 		{
 			if (AllWordlists[i].ListName == name)
 			{
@@ -74,7 +74,7 @@ public class AllWordListsData
 
 	public FullWordListData GetFullWordListByLanguage(string language)
 	{
-		for(int i = 0; i < AllWordlists.Length; i++)
+		for(int i = 0; i < AllWordlists.Count; i++)
 		{
 			if(AllWordlists[i].GetSectionByLanguage(language) != null)
 			{

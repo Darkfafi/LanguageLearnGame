@@ -13,82 +13,166 @@ public class WordListModifierScreen : MonoBehaviour
 	private RectTransform listHolder;
 
 	[SerializeField]
-	private Button wordListButtonPrefab;
+	private WordListButton wordListButtonPrefab;
 
 	[SerializeField]
 	private WordListEditScreen wordListEditScreen;
 
+	[SerializeField]
+	private AskNamePopUp namePopUp;
+
+	[SerializeField]
+	private Button backButton;
+
+	[SerializeField]
+	private Button saveButton;
+
 	// Data
 	private static AllWordListsData allData = SaveLoadWordData.Load();
-	private List<Button> allCurrentButtons = new List<Button>();
+	private List<WordListButton> allCurrentButtons = new List<WordListButton>();
 
-	void Awake ()
+	private void Awake()
 	{
+		Activate();
+	}
+
+	private void OnDestroy()
+	{
+		saveButton.onClick.RemoveAllListeners();
+		backButton.onClick.RemoveAllListeners();
+		DeleteCurrentButtons();
+	}
+
+	public void Activate ()
+	{
+		DeleteCurrentButtons();
+		namePopUp.gameObject.SetActive(false);
 		wordListEditScreen.gameObject.SetActive(false);
 		GenerateListButtons();
+
+		saveButton.onClick.RemoveAllListeners();
+		backButton.onClick.RemoveAllListeners();
+
+		saveButton.onClick.AddListener(() => OnSaveClicked());
+		backButton.onClick.AddListener(() => OnBackClicked());
     }
+
+	private void OnSaveClicked()
+	{
+		SaveModifiedData();
+	}
+
+	private void OnBackClicked()
+	{
+		Debug.Log("Back! (List View)");
+	}
 
 	private void GenerateListButtons()
 	{
-		allCurrentButtons.Clear();
+		DeleteCurrentButtons();
         float space = 10.0f;
-		int listAmounts = allData.AllWordlists.Length;
-		Button b = GameObject.Instantiate<Button>(wordListButtonPrefab);
+		int listAmounts = allData.AllWordlists.Count;
+		WordListButton b = GameObject.Instantiate<WordListButton>(wordListButtonPrefab);
 		RectTransform rt = b.transform as RectTransform;
 		listHolder.sizeDelta = new Vector2(listHolder.sizeDelta.x, (listAmounts * space + (listAmounts + 1) * rt.sizeDelta.y) + space);
         for (int i = 0; i <= listAmounts; i++)
 		{
 			if (i != 0)
 			{
-				b = GameObject.Instantiate<Button>(wordListButtonPrefab);
+				b = GameObject.Instantiate<WordListButton>(wordListButtonPrefab);
 			}
 
-			Text text = b.GetComponentInChildren<Text>();
 			if(i == listAmounts)
 			{
-				text.text = "<Create new list>";
-			}
+				b.SetText("<Create new list>");
+            }
 			else
 			{
-				text.text = allData.AllWordlists[i].ListName;
+				b.SetText(allData.AllWordlists[i].ListName);
 			}
 			rt = b.transform as RectTransform;
 			rt.SetParent(listHolder, false);
 			rt.localPosition = new Vector3(b.transform.position.x, b.transform.position.y - (rt.sizeDelta.y / 1.5f) - ((rt.sizeDelta.y + space) * i), b.transform.position.z);
 			allCurrentButtons.Add(b);
-            b.onClick.AddListener(() => WordListButtonPressed(b, text));
-		}
+			b.AccessButtonPressedEvent -= WordListButtonPressed;
+			b.AccessButtonPressedEvent += WordListButtonPressed;
+
+			b.DeleteButtonPressedEvent -= DeleteWordButtonPressed;
+			b.DeleteButtonPressedEvent += DeleteWordButtonPressed;
+        }
 	}
 
-	private void WordListButtonPressed(Button button, Text text)
+	private void WordListButtonPressed(WordListButton button)
 	{
-		if(text.text == "<Create new list>")
+		if(button.GetText() == "<Create new list>")
 		{
 			CreateNewList();
 		}
 		else
 		{
-			OpenModifyScreen(text.text);
+			OpenModifyScreen(button.GetText());
 		}
+	}
+
+	private void DeleteWordButtonPressed(WordListButton button)
+	{
+		allData.AllWordlists.Remove(allData.GetFullWordListByListName(button.GetText()));
+		Activate();
 	}
 
 	private void CreateNewList()
 	{
-		
+		namePopUp.gameObject.SetActive(true);
+		namePopUp.SetTitleText("Name your wordlist:");
+		namePopUp.SetPlaceholderInputText("Wordlist name....");
+
+		namePopUp.PopupButtonPressedEvent -= OnPopupButtonPressedEvent;
+		namePopUp.PopupButtonPressedEvent += OnPopupButtonPressedEvent;
+    }
+
+	private void OnPopupButtonPressedEvent(string givenString, AskNamePopUp.ButtonType buttonType, AskNamePopUp popup)
+	{
+		namePopUp.PopupButtonPressedEvent -= OnPopupButtonPressedEvent;
+		if (buttonType == AskNamePopUp.ButtonType.Create)
+		{
+			if (allData.GetFullWordListByListName(givenString) != null)
+			{
+				popup.SetWarningText("Name '" + givenString + "' already in use!");
+				CreateNewList();
+				return;
+			}
+
+			allData.AllWordlists.Add(new FullWordListData(givenString, new WordListSectionData[] { new WordListSectionData(FullWordListData.BASE_LANGUAGE, new string[] { }) }));
+			SaveModifiedData();
+			OpenModifyScreen(givenString);
+		}
+
+		popup.Clean();
 	}
 
 	private void OpenModifyScreen(string nameWordList)
 	{
-		foreach(Button b in allCurrentButtons)
-		{
-			b.onClick.RemoveAllListeners();
-			Destroy(b.gameObject);
-		}
-		allCurrentButtons.Clear();
+		saveButton.onClick.RemoveAllListeners();
+		backButton.onClick.RemoveAllListeners();
 
-		wordListEditScreen.gameObject.SetActive(true);
+		DeleteCurrentButtons();
+        wordListEditScreen.gameObject.SetActive(true);
 		wordListEditScreen.ShowListForModification(allData.GetFullWordListByListName(nameWordList));
-    }
+	}
+
+	private void DeleteCurrentButtons()
+	{
+		if (allCurrentButtons.Count > 0)
+		{
+			foreach (WordListButton b in allCurrentButtons)
+			{
+				b.AccessButtonPressedEvent -= WordListButtonPressed;
+				b.DeleteButtonPressedEvent -= DeleteWordButtonPressed;
+				Destroy(b.gameObject);
+			}
+			allCurrentButtons.Clear();
+		}
+	}
 
 	public static void SaveModifiedData()
 	{
