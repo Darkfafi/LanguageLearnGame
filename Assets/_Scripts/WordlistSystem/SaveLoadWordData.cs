@@ -64,7 +64,7 @@ public class AllWordListsData
 	{
 		for (int i = 0; i < AllWordlists.Count; i++)
 		{
-			if (AllWordlists[i].ListName == name)
+			if (AllWordlists[i].ListName.ToLower() == name.ToLower())
 			{
 				return AllWordlists[i];
 			}
@@ -103,7 +103,7 @@ public class FullWordListData
 	{
 		for (int i = 0; i < AllWordListDatas.Count; i++)
 		{
-			if (AllWordListDatas[i].Language == language)
+			if (AllWordListDatas[i].Language.ToLower() == language.ToLower())
 			{
 				return AllWordListDatas[i];
 			}

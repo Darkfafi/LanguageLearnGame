@@ -45,6 +45,7 @@ public class WordListModifierScreen : MonoBehaviour
 
 	public void Activate ()
 	{
+		allData = SaveLoadWordData.Load();
 		DeleteCurrentButtons();
 		namePopUp.gameObject.SetActive(false);
 		wordListEditScreen.gameObject.SetActive(false);
@@ -55,6 +56,8 @@ public class WordListModifierScreen : MonoBehaviour
 
 		saveButton.onClick.AddListener(() => OnSaveClicked());
 		backButton.onClick.AddListener(() => OnBackClicked());
+
+		title.text = "Word lists";
     }
 
 	private void OnSaveClicked()
@@ -85,6 +88,7 @@ public class WordListModifierScreen : MonoBehaviour
 			if(i == listAmounts)
 			{
 				b.SetText("<Create new list>");
+				b.HideDeleteButton();
             }
 			else
 			{
@@ -123,8 +127,8 @@ public class WordListModifierScreen : MonoBehaviour
 	private void CreateNewList()
 	{
 		namePopUp.gameObject.SetActive(true);
-		namePopUp.SetTitleText("Name your wordlist:");
-		namePopUp.SetPlaceholderInputText("Wordlist name....");
+		namePopUp.SetTitleText("Name your word list:");
+		namePopUp.SetPlaceholderInputText("Word list name....");
 
 		namePopUp.PopupButtonPressedEvent -= OnPopupButtonPressedEvent;
 		namePopUp.PopupButtonPressedEvent += OnPopupButtonPressedEvent;

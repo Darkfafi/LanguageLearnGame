@@ -7,6 +7,9 @@ using UnityEngine.Events;
 public class WordListEditScreen : MonoBehaviour
 {
 	[SerializeField]
+	private Text title;
+
+	[SerializeField]
 	private RectTransform contentHolder;
 
 	[SerializeField]
@@ -58,7 +61,7 @@ public class WordListEditScreen : MonoBehaviour
 		createLanguageTabButton.onClick.AddListener(() => CreateLanguage());
 		saveButton.onClick.AddListener(() => SaveData());
 		backButton.onClick.AddListener(() => BackButtonPressed());
-	}
+    }
 
 	protected void OnDisable()
 	{
@@ -73,7 +76,8 @@ public class WordListEditScreen : MonoBehaviour
 	public void ShowListForModification(FullWordListData data)
 	{
 		currentData = data;
-		SelectLanguage(currentLanguageSelected);
+		SelectLanguage(FullWordListData.BASE_LANGUAGE);
+		title.text = "Word list: " + currentData.ListName;
 	}
 
 	private void SetLanguageTabs()
