@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace Editor.ScreenGridEditor
 {
-	[ExecuteInEditMode]
+	//[ExecuteInEditMode]
 	public class GridDisplay : MonoBehaviour
 	{
 		public float SizeY = 1;
