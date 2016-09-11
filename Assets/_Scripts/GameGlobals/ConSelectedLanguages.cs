@@ -1,15 +1,35 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Ramses.Confactory;
+using System;
 
-public class ConSelectedLanguages : MonoBehaviour {
+public class ConSelectedLanguages : IConfactory
+{
 
-	// Use this for initialization
-	void Start () {
-	
+	public FullWordListData		SelectedWordList		{ get; private set; }
+	public WordListSectionData	LanguageToTranslate		{ get; private set; }
+	public WordListSectionData	TranslationLanguage		{ get; private set; }
+
+
+	public void SetLanguages(string wordlistName, string languageToTranslate, string translationLanguage)
+	{
+		SelectedWordList = SaveLoadWordData.Load().GetFullWordListByListName(wordlistName);
+		LanguageToTranslate = SelectedWordList.GetSectionByLanguage(languageToTranslate);
+		TranslationLanguage = SelectedWordList.GetSectionByLanguage(translationLanguage);
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
+
+	public void ConClear()
+	{
+
+	}
+
+	public void ConStruct()
+	{
+
+	}
+
+	public void OnSceneSwitch(int newSceneIndex)
+	{
+
 	}
 }

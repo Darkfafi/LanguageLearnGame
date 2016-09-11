@@ -121,6 +121,7 @@ public class WordListModifierScreen : MonoBehaviour
 	private void DeleteWordButtonPressed(WordListButton button)
 	{
 		allData.AllWordlists.Remove(allData.GetFullWordListByListName(button.GetText()));
+		SaveModifiedData();
 		Activate();
 	}
 

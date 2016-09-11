@@ -15,7 +15,7 @@ public class TypeControlls : MonoBehaviour, IConfactory
 
 	private string currentString = "";
 
-	void Update ()
+	protected void Update ()
 	{
 		foreach (char c in Input.inputString)
 		{
