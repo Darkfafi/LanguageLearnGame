@@ -67,6 +67,7 @@ public class WordListModifierScreen : MonoBehaviour
 
 	private void OnBackClicked()
 	{
+		Ramses.Confactory.ConfactoryFinder.Instance.Give<ConSceneSwitcher>().SwitchScreen("Menu");
 		Debug.Log("Back! (List View)");
 	}
 
