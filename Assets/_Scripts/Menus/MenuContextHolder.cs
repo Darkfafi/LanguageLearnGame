@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using UnityEngine.UI;
 public class MenuContextHolder : MonoBehaviour {
 
 	public enum ContextScreens
@@ -11,37 +11,70 @@ public class MenuContextHolder : MonoBehaviour {
 	}
 
 	[SerializeField]
+	private Text globalTitle;
+
+	[SerializeField]
 	private ContextScreen[] allContextScreens;
 
 	private ConSceneSwitcher sceneSwitcher;
 
+	private ContextScreen preScreen = null;
+	private ContextScreen screenSwitchingTo = null;
+
 	protected void Awake()
 	{
 		sceneSwitcher = Ramses.Confactory.ConfactoryFinder.Instance.Give<ConSceneSwitcher>();
-
-		for (int i = 0; i < allContextScreens.Length; i++)
+		sceneSwitcher.FullBlackEvent += OnBlackFullEvent;
+        for (int i = 0; i < allContextScreens.Length; i++)
 		{
 			allContextScreens[i].SetContextScreen(this);
-			allContextScreens[i].gameObject.SetActive(allContextScreens[i].IsContextScreen(ContextScreens.MenuContext));
+			if (allContextScreens[i].IsContextScreen(ContextScreens.MenuContext))
+			{
+				allContextScreens[i].OpenScreen();
+			}
+			else
+			{
+				allContextScreens[i].gameObject.SetActive(false);
+            }
         }
+	}
+
+	public void SetGlobalTitleText(string text)
+	{
+		globalTitle.text = text;
 	}
 
 	public void SwitchSceneContext(ContextScreens sceneToShow)
 	{
 		ContextScreen currentScene = null;
-		sceneSwitcher.FakeSwitchScreen();
+        sceneSwitcher.FakeSwitchScreen();
         for (int i = 0; i < allContextScreens.Length; i++)
 		{
 			currentScene = allContextScreens[i];
             if (!currentScene.IsOpened && currentScene.IsContextScreen(sceneToShow))
 			{
-				currentScene.OpenScreen();
-			}
+				screenSwitchingTo = currentScene;
+            }
 
 			if (currentScene.IsOpened && !currentScene.IsContextScreen(sceneToShow))
 			{
-				currentScene.CloseScreen();
+				preScreen = currentScene;
 			}
 		}
+	}
+
+	private void OnBlackFullEvent()
+	{
+		if (preScreen != null)
+		{
+			preScreen.CloseScreen();
+			preScreen = null;
+		}
+
+		if (screenSwitchingTo != null)
+		{
+			screenSwitchingTo.OpenScreen();
+			screenSwitchingTo = null;
+        }
 	}
 }

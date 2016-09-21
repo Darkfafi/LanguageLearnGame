@@ -19,14 +19,6 @@ public class MainMenu : ContextScreen {
 	[SerializeField]
 	private Button exitButton;
 
-	// Context Screens
-
-	[SerializeField]
-	private GameObject playScreen;
-
-	[SerializeField]
-	private GameObject statsScreen;
-
 	private ConSceneSwitcher conSceneSwitcher;
 
 	protected void Awake()
@@ -39,6 +31,12 @@ public class MainMenu : ContextScreen {
 	{
 		RemoveButtonEventListeners();
     }
+
+	public override void OpenScreen()
+	{
+		base.OpenScreen();
+		menuContextHolder.SetGlobalTitleText("Main Menu");
+	}
 
 	private void AddButtonEventListeners()
 	{

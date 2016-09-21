@@ -6,6 +6,10 @@ using UnityEngine.SceneManagement;
 
 public class ConSceneSwitcher : IConfactory
 {
+	public delegate void SceneSwitcherHandler();
+	public event SceneSwitcherHandler FullBlackEvent;
+	public event SceneSwitcherHandler BlackClearedEvent;
+
 	ScreenTransitionObject transitionObject;
 	private string nextSceneName = "NO_SCENE";
 	private bool fakeSwitch = false;
@@ -27,6 +31,7 @@ public class ConSceneSwitcher : IConfactory
 	public void ConClear()
 	{
 		transitionObject.FadeInCompleteEvent -= FadeInComplete;
+		transitionObject.FadeOutCompleteEvent -= FadeOutComplete;
 		GameObject.Destroy(transitionObject.gameObject);
 	}
 
@@ -36,7 +41,11 @@ public class ConSceneSwitcher : IConfactory
 		ConfactoryTools.SetObjectWithConGameObjectSettings(transitionObject.gameObject);
 		transitionObject.FadeInCompleteEvent -= FadeInComplete;
 		transitionObject.FadeInCompleteEvent += FadeInComplete;
-    }
+
+
+		transitionObject.FadeOutCompleteEvent -= FadeOutComplete;
+		transitionObject.FadeOutCompleteEvent += FadeOutComplete;
+	}
 
 	public void OnSceneSwitch(int newSceneIndex)
 	{
@@ -54,5 +63,18 @@ public class ConSceneSwitcher : IConfactory
 			OnSceneSwitch(0);
         }
 		nextSceneName = "NO_SCENE";
+
+		if(FullBlackEvent != null)
+		{
+			FullBlackEvent();
+        }
+	}
+
+	private void FadeOutComplete()
+	{
+		if (BlackClearedEvent != null)
+		{
+			BlackClearedEvent();
+		}
 	}
 }
