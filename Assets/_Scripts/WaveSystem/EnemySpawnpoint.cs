@@ -26,6 +26,6 @@ public class EnemySpawnpoint : MonoBehaviour {
 		Enemy prefab = conEnemyTracker.EnemyLibrary.GetEnemyPrefab(unitName);
         Enemy enemy = Instantiate<Enemy>(prefab);
         enemy.transform.position = transform.position;
-		enemy.PathWalker.SetWalker(comCurrentLevel.CurrentLevel.LevelPaths[pathIndex], enemy.MovementSpeed);
+		enemy.PathWalker.SetWalker(comCurrentLevel.CurrentLevelObject.LevelPaths[pathIndex], enemy.MovementSpeed);
     }
 }

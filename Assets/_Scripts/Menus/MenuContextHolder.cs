@@ -6,7 +6,8 @@ public class MenuContextHolder : MonoBehaviour {
 	public enum ContextScreens
 	{
 		MenuContext,
-		PlayContext,
+		PlaySettingsContext,
+		PlayLevelSelectContext,
 		StatsContext
 	}
 

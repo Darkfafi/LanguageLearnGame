@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using System;
 
-public class PlaySettingsScene : ContextScreen {
+public class PlaySettingsContext : ContextScreen {
 
 	// Section 1
 
@@ -85,6 +85,7 @@ public class PlaySettingsScene : ContextScreen {
 		Debug.Log(settings.ShowWordToTranslateOnly);
 
 		Ramses.Confactory.ConfactoryFinder.Instance.Give<ConCurrentGameplaySettings>().SetCurrentGameplaySettings(settings);
+		menuContextHolder.SwitchSceneContext(MenuContextHolder.ContextScreens.PlayLevelSelectContext);
         Debug.Log("Next!");
 	}
 

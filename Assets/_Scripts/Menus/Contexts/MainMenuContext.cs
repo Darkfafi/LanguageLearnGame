@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 using Ramses.Confactory;
 
-public class MainMenu : ContextScreen {
+public class MainMenuContext : ContextScreen {
 
 
 	// Buttons
@@ -56,7 +56,7 @@ public class MainMenu : ContextScreen {
 
 	private void OnPlayButtonPressed()
 	{
-		menuContextHolder.SwitchSceneContext(MenuContextHolder.ContextScreens.PlayContext);
+		menuContextHolder.SwitchSceneContext(MenuContextHolder.ContextScreens.PlaySettingsContext);
 		Debug.Log("Play pressed");
 	}
 

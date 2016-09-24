@@ -5,18 +5,33 @@ using System;
 
 public class ConCurrentLevel :  IConfactory
 {
-	public LevelPlayground CurrentLevel { get; private set; }
+
+	public LevelPlayground CurrentLevelObject { get { return spawnedLevel; } }
+	public string CurrentLevelName { get; private set; }
 
 	public LevelLibrary LevelLibrary { get; private set; }
 
+	private LevelPlayground spawnedLevel;
+
 	public void SetCurrentLevel(string levelName)
 	{
-		SetCurrentLevel(LevelLibrary.GetLevelByName(levelName));
-    }
+		CurrentLevelName = levelName;
+	}
 
-	public void SetCurrentLevel(LevelPlayground level)
+	public LevelPlayground CreateCurrentLevelObject() 
 	{
-		CurrentLevel = level;
+		RemoveCurrentLevelObject();
+		spawnedLevel = GameObject.Instantiate<LevelPlayground>(LevelLibrary.GetLevelByName(CurrentLevelName));
+		return spawnedLevel;
+	}
+
+	public void RemoveCurrentLevelObject() 
+	{
+		if (spawnedLevel != null) 
+		{
+			GameObject.Destroy(spawnedLevel);
+			spawnedLevel = null;
+        }
 	}
 
 	public void ConClear()

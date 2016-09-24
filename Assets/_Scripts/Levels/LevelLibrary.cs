@@ -46,6 +46,19 @@ public class LevelLibrary : ScriptableObject {
 		return null;
 	}
 
+	public LevelDifficulty GetDifficultyByLevelName(string levelName)
+	{
+		for (int i = 0; i < levels.Length; i++)
+		{
+			if (levels[i].LevelName == levelName)
+			{
+				return levels[i].LevelDifficulty;
+			}
+		}
+		Debug.LogError("Level with name '" + name + "' could not be found. Please check the LevelLibrary");
+		return LevelDifficulty.Easy;
+	}
+
 	public LevelPlayground[] GetLevelsByDifficulty(LevelDifficulty difficulty)
 	{
 		List<LevelPlayground> allLevelsOfDifficulty = new List<LevelPlayground>();
